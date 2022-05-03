@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <script src="gameMethods.js" ></script>
+    </head>
+    <body onload="moveGamePageIfUserProfileIsValid()">
+        <form name="userRegistForm">
+            <label for="userName">User name</label>
+            <input type="text" name="userName" id="userName" required /><br />
+            <label for="userPasswd">User password</label>
+            <input type="password" name="userPasswd" id="userPasswd" required /><br />
+            <button id="submit" onclick="registUser()">Submit</button>
+
+        </form>
+    </body>
+</html>
