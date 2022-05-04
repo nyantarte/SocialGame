@@ -1,8 +1,33 @@
+var curGameState=null;
+const fontSize=30;
+const MAIN_MENU_MODE=0;
+const WAREHOUSE_MODE=MAIN_MENU_MODE+1;
+const ORGANIZE_MODE=WAREHOUSE_MODE+1;
 function userProfile(_userName,_userPasswd){
     this.userName=_userName;
     this.userPasswd=_userPasswd;
- 
+    this.userLevel=1;
+
 }
+function gameState(){
+    this.userProfile=JSON.parse(localStorage["userProfile"]);
+    this.curMode=MAIN_MENU_MODE;
+    this.mouseClickState=false;
+    this.eventStateIdx=0;
+    this.clickXPos=0;
+    this.clickYPos=0;
+
+  
+}
+function onClick(e){
+    var rect=e.target.getBoundingClientRect();
+    curGameState.clickXPos=e.clientX-rect.left;
+    curGameState.clickYPos=e.clientY-rect.top;
+    curGameState.mouseClickState=true;
+    
+   
+}
+
 function registUser(){
     var userName=document.userRegistForm.userName.value;
     var userPasswd=document.userRegistForm.userPasswd.value;
@@ -18,16 +43,65 @@ function initCanvas(){
     var canvas=document.getElementById("canvas");
     canvas.width=window.screen.availWidth;
     canvas.height=window.screen.availHeight;
+    canvas.addEventListener("click",onClick,true);
 
 }
 function checkUserProfileExist(){
     var profile=localStorage.getItem("userProfile");
     return null!=profile;
 }
+
 function initGame(){
     initCanvas();
     if(!checkUserProfileExist()){
         document.location.href="./regist.html";
+    }else{
+        curGameState=new gameState();
+        setTimeout(updateGameState,1000/15);
     }
 
+}
+function drawButton(context,caption,x,y){
+    var btnW=caption.length*fontSize;
+    
+    context.fillText(caption,x,y,btnW);
+    context.beginPath();
+    context.rect(x,y,btnW,fontSize);
+    context.stroke();
+   
+    if(x < curGameState.clickXPos && (x+btnW)>curGameState.clickXPos &&
+       y < curGameState.clickYPos && (y+fontSize)>curGameState.clickYPos){
+           return curGameState.mouseClickState;
+       }
+    return false;
+
+}
+function updateGameState(){
+    var canvas = document.getElementById("canvas");
+    var context = canvas.getContext('2d');
+    context.fillStyle ="white";
+    context.fillStyle = "rgb(255,255, 255)";
+    context.strokeStyle = "rgb(255,255, 255)";
+    context.font = fontSize+"px 'ＭＳ ゴシック'";
+    
+    context.textAlign = "left";
+    context.textBaseline = "top";
+    context.clearRect(0,0,canvas.width,canvas.height);
+        if(MAIN_MENU_MODE==curGameState.curMode){
+            context.fillText(curGameState.userProfile.userName,0,0);
+            var tmpTxt="Warehouse";
+            var xPos=0;
+            console.log(0+":"+curGameState.clickXPos+","+curGameState.clickYPos);
+            if(drawButton(context,tmpTxt,xPos,canvas.height-fontSize)){
+               
+            }
+            xPos=tmpTxt.length*fontSize;
+            tmpTxt="Organize";
+            drawButton(context,tmpTxt,xPos,canvas.height-fontSize);
+        
+        }
+    curGameState.eventStateIdx=(curGameState.eventStateIdx+1)%2;
+ 
+    curGameState.mouseClickState=false;
+    setTimeout(updateGameState,1000/15);
 }
