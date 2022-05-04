@@ -3,6 +3,12 @@ const fontSize=30;
 const MAIN_MENU_MODE=0;
 const WAREHOUSE_MODE=MAIN_MENU_MODE+1;
 const ORGANIZE_MODE=WAREHOUSE_MODE+1;
+const MISSION_MODE=ORGANIZE_MODE+1;
+
+
+const LIST_NOT_SELECTED=-1;
+const LIST_BEGIN_PROG=-2;
+const LIST_BEGIN_FBACK=-3;
 function userProfile(_userName,_userPasswd){
     this.userName=_userName;
     this.userPasswd=_userPasswd;
@@ -16,7 +22,7 @@ function gameState(){
     this.eventStateIdx=0;
     this.clickXPos=0;
     this.clickYPos=0;
-
+    
   
 }
 function onClick(e){
@@ -76,6 +82,28 @@ function drawButton(context,caption,x,y){
     return false;
 
 }
+function drawList(context,items,begin,x,y,w,h){
+    if(begin >=items.length){
+        return LIST_NOT_SELECTED;
+
+    }
+    if(drawButton(context,"-",(x+w)-fontSize,y)){
+        return LIST_BEGIN_FBACK;
+    }
+    if(drawButton(context,"+",(x+w)-fontSize,(y+h)-fontSize)){
+        return LIST_BEGIN_PROG;
+    }
+    var num=h/fontSize;
+    for(var i=0;i < num;++i){
+        var yPos=y+fontSize*i;
+        if(drawButton(context,items[begin+i].toString(),x,yPos)){
+            return i;
+        }
+
+    }
+    return LIST_NOT_SELECTED;
+
+}
 function updateGameState(){
     var canvas = document.getElementById("canvas");
     var context = canvas.getContext('2d');
@@ -91,14 +119,19 @@ function updateGameState(){
             context.fillText(curGameState.userProfile.userName,0,0);
             var tmpTxt="Warehouse";
             var xPos=0;
-            console.log(0+":"+curGameState.clickXPos+","+curGameState.clickYPos);
             if(drawButton(context,tmpTxt,xPos,canvas.height-fontSize)){
-               
+                curGameState.curMode=WAREHOUSE_MODE;
             }
             xPos=tmpTxt.length*fontSize;
             tmpTxt="Organize";
-            drawButton(context,tmpTxt,xPos,canvas.height-fontSize);
-        
+            if(drawButton(context,tmpTxt,xPos,canvas.height-fontSize)){
+                curGameState.curMode=ORGANIZE_MODE;
+            }
+            tmpTxt="Mission";
+            xPos=canvas.width-tmpTxt.length*fontSize;
+            if(drawButton(context,tmpTxt,xPos,canvas.height-fontSize)){
+                curGameState.curMode=MISSION_MODE;
+            }
         }
     curGameState.eventStateIdx=(curGameState.eventStateIdx+1)%2;
  
